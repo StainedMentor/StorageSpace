@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:storagespace/pie.dart';
 import 'scanner.dart';
 
@@ -20,7 +21,7 @@ class _MyAppState extends State<MyApp> {
     PieSliceData(color: Colors.red, percentage: 0.35, label: 'Smaller files', value: 1),
   ];
 
-  FolderSizeCalculator scanner = FolderSizeCalculator("/Users/oli/Desktop");
+  FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
   late FileSystemNode base;
 
   @override

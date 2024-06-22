@@ -7,37 +7,44 @@ import 'dart:math';
 
 
 // Function to get the path of the Desktop directory
-Future<String?> getDesktopDirectory() async {
-  // try {
-  //   Directory homeDir = await getApplicationSupportDirectory();
-  //   String homePath = homeDir.parent.parent.path; // Navigate to home directory
+String? getDesktopDirectory() {
+  try {
+    String? home = "";
+    String? desktopPath;
 
-  //   print("Home Directory: $homePath"); // Debug: Print the home directory
+    Map<String, String> envVars = Platform.environment;
+    if (Platform.isMacOS || Platform.isLinux) {
+      home = envVars['HOME'];
+    } 
+    else if (Platform.isWindows) {
+      home = envVars['UserProfile'];
+    }
+    else {
+      return null;
+    }
 
-  //   String desktopPath;
-  //   if (Platform.isWindows) {
-  //     desktopPath = '$homePath\\Desktop';
-  //   } else if (Platform.isMacOS || Platform.isLinux) {
-  //     desktopPath = '$homePath/Desktop';
-  //   } else {
-  //     // Handle other platforms or return null if not applicable
-  //     return null;
-  //   }
+    print("Home path: $home");
+    
 
-  //   print("Detected Desktop Path: $desktopPath"); // Debug: Print the desktop path
+  if (Platform.isWindows) {
+    desktopPath = '$home\\Desktop';
+  } else if (Platform.isMacOS || Platform.isLinux) {
+    desktopPath = '$home/Desktop';
+  } else {
+    return null;
+  }
 
-  //   // Check if the directory exists
-  //   if (Directory(desktopPath).existsSync()) {
-  //     return desktopPath;
-  //   } else {
-  //     print("Desktop directory does not exist.");
-  //     return null;
-  //   }
-  // } catch (e) {
-  //   print("Error locating Desktop folder: $e");
-  //   return null;
-  // }
-  return "/Users/oli/Desktop";
+    // Check if the directory exists
+    if (Directory(desktopPath).existsSync()) {
+      return desktopPath;
+    } else {
+      print("Desktop directory does not exist.");
+      return null;
+    }
+  } catch (e) {
+    print("Error locating Desktop folder: $e");
+    return null;
+  }
 }
 
 // Function to format bytes into human-readable format
