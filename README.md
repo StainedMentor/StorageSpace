@@ -1,3 +1,3 @@
-# storagespace
+# Storage Space
 
-A new Flutter project.
+A cross-platform app for managing disk utilisation.
