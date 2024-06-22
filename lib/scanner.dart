@@ -1,11 +1,7 @@
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:math';
-import 'package:file_picker/file_picker.dart';
 
 
 
@@ -44,7 +40,6 @@ Future<String?> getDesktopDirectory() async {
   return "/Users/oli/Desktop";
 }
 
-
 // Function to format bytes into human-readable format
 String formatBytes(int bytes, int decimals) {
   if (bytes <= 0) return "0 B";
@@ -53,9 +48,6 @@ String formatBytes(int bytes, int decimals) {
   double num = bytes / pow(1024, i);
   return "${num.toStringAsFixed(decimals)} ${suffixes[i]}";
 }
-
-
-
 
 
 

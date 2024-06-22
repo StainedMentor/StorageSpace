@@ -1,7 +1,5 @@
 
-
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:storagespace/scanner.dart';
 
@@ -128,11 +126,11 @@ Widget _buildHoverText() {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Label: ${hoveredSlice.label}',  // Display label
+          'Label: ${hoveredSlice.label}',  
           style: TextStyle(color: Colors.white, fontSize: 12),
         ),
         Text(
-          'Value: ${formatBytes(hoveredSlice.value, 2)}',  // Display value
+          'Value: ${formatBytes(hoveredSlice.value, 2)}', 
           style: TextStyle(color: Colors.white, fontSize: 12),
         ),
         Text(
@@ -210,7 +208,7 @@ class _SliceButtonState extends State<SliceButton> {
             painter: SlicePainter(
               startAngle: widget.startAngle,
               sweepAngle: widget.sweepAngle,
-              color: _isHover ? widget.color.withOpacity(0.8) : widget.color, // Change color on hover
+              color: _isHover ? widget.color.withOpacity(0.8) : widget.color,
             ),
             
           ))
@@ -260,7 +258,6 @@ class SliceClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    // Always reclip for simplicity, or you can add logic to only reclip if angles have changed
     return true;
   }
 }
@@ -284,13 +281,11 @@ class SlicePainter extends CustomPainter {
 
     final Rect rect = Rect.fromCircle(center: Offset(size.width / 2, size.height / 2), radius: size.width / 2);
 
-    // Correct the arc drawing to fill the slice correctly
     canvas.drawArc(rect, startAngle, sweepAngle, true, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    // Always repaint for simplicity, or add logic to repaint only when necessary
     return true;
   }
 }

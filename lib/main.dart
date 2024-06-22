@@ -1,8 +1,6 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:storagespace/pie.dart';
-import 'dart:math';
 import 'scanner.dart';
 
 void main() {
@@ -28,7 +26,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // Uncomment and define this method if needed.
     readyMap();
   }
 
@@ -43,7 +40,6 @@ class _MyAppState extends State<MyApp> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // PieChart
                     PieChart(
                         slices: slices,
                         radius: 150,
@@ -54,7 +50,6 @@ class _MyAppState extends State<MyApp> {
                     
                     FloatingActionButton(
                         onPressed: () {
-                          // Add your button onPressed logic here
                           if (base.parent != null){
                           base = base.parent!;
                           prepareSliceData();
@@ -84,7 +79,6 @@ class _MyAppState extends State<MyApp> {
   }
 
 
-  // Define any additional methods for state management here.
   Future<void> prepareSliceData() async {
 
     base.children.sort((a, b) => a.size.compareTo(b.size));
@@ -123,46 +117,3 @@ class _MyAppState extends State<MyApp> {
 
 
 
-
-class FolderSizeDisplay extends StatefulWidget {
-  @override
-  _FolderSizeDisplayState createState() => _FolderSizeDisplayState();
-}
-
-class _FolderSizeDisplayState extends State<FolderSizeDisplay> {
-  String _folderSize = 'Calculating...';
-
-  @override
-  void initState() {
-    super.initState();
-    // _calculateDesktopFolderSize();
-  }
-
-  // Function to calculate the size of the Desktop directory
-  Future<void> _calculateDesktopFolderSize() async {
-    String? desktopPath = await getDesktopDirectory();
-    if (desktopPath != null) {
-      // int size = await getFolderSize(Directory(desktopPath));  
-      FolderSizeCalculator scanner = FolderSizeCalculator(desktopPath);
-      FileSystemNode base = await scanner.mapFileSystem();
-      setState(() {
-        _folderSize = formatBytes(base.size, 2);
-      });
-    } else {
-      setState(() {
-        _folderSize = "Could not locate the Desktop folder.";
-      });
-    }
-  }
-
-   @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: Text(
-          _folderSize,
-          style: TextStyle(fontSize: 24),
-        ),
-      );
-  }
-
-}
