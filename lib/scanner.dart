@@ -4,6 +4,18 @@ import 'dart:io';
 import 'dart:math';
 
 
+String? getRootPath() {
+      if (Platform.isMacOS || Platform.isLinux) {
+      return "/";
+    } 
+    else if (Platform.isWindows) {
+      return "C: ";
+    }
+    else {
+      return null;
+    }
+
+}
 
 
 // Function to get the path of the Desktop directory

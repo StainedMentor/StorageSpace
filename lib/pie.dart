@@ -22,11 +22,13 @@ class PieChart extends StatefulWidget {
   final List<PieSliceData> slices;
   final double radius;
   final ValueChanged<int> onPressed;
+  final GlobalKey key;
 
   PieChart({
     required this.slices,
     required this.radius,
-    required this.onPressed,
+    required this.onPressed, 
+    required this.key,
   });
 
   @override
@@ -36,6 +38,8 @@ class PieChart extends StatefulWidget {
 class _PieChartState extends State<PieChart> {
   int? _hoveredIndex;
   Offset _hoverPosition = Offset.zero;
+
+
   @override
   void didUpdateWidget(PieChart oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -50,7 +54,13 @@ class _PieChartState extends State<PieChart> {
   void _onHover(int index, Offset position) {
     setState(() {
       _hoveredIndex = index;
-      _hoverPosition = position;
+      
+      RenderBox box = widget.key.currentContext!.findRenderObject() as RenderBox;
+      Offset globalOffset = box.localToGlobal(Offset.zero);
+
+      _hoverPosition =  position - globalOffset;
+
+      print(position);
     });
   }
 
@@ -220,6 +230,7 @@ class _SliceButtonState extends State<SliceButton> {
     setState(() {
       _isHover = value;
     });
+  
     widget.onHover(value, details?.position ?? Offset.zero);
   }
 

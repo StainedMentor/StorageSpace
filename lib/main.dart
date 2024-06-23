@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:storagespace/list_widget.dart';
 import 'package:storagespace/pie.dart';
 import 'scanner.dart';
 
@@ -23,6 +24,9 @@ class _MyAppState extends State<MyApp> {
 
   FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
   late FileSystemNode base;
+  List<FileSystemNode> filelist = [];
+
+  GlobalKey key = GlobalKey();
 
   @override
   void initState() {
@@ -37,8 +41,14 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Storage Space'),
         ),
-        body: Center(
-                child: Stack(
+        body: 
+        Row(
+          children: [
+            Expanded(child: 
+            FileSystemWidget(nodes: filelist)),
+
+            Expanded(child: 
+ Stack(
                   alignment: Alignment.center,
                   children: [
                     PieChart(
@@ -47,6 +57,7 @@ class _MyAppState extends State<MyApp> {
                         onPressed: (int index) {
                           sliceClicked(index);
                         },
+                        key: key,
                       ),
                     
                     FloatingActionButton(
@@ -62,7 +73,8 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               
-            
+            )
+          ]
         ),
       ),
     );
@@ -76,6 +88,8 @@ class _MyAppState extends State<MyApp> {
 
   void readyMap() async {
     base = await scanner.mapFileSystem();
+    filelist = base.children;
+
         prepareSliceData();
   }
 
