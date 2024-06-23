@@ -48,9 +48,8 @@ class _MyAppState extends State<MyApp> {
             FileSystemWidget(nodes: filelist)),
 
             Expanded(child: 
- Stack(
-                  alignment: Alignment.center,
-                  children: [
+                  Padding(padding: EdgeInsets.all(40),
+                  child: 
                     PieChart(
                         slices: slices,
                         radius: 150,
@@ -60,10 +59,8 @@ class _MyAppState extends State<MyApp> {
                         key: key,
                         exitFolder: exitFolder
                       ),
-                    
-                  ],
-                ),
-              
+                  )
+                
             )
           ]
         ),
@@ -123,7 +120,6 @@ class _MyAppState extends State<MyApp> {
 
     setState(() {
           slices = tempList;
-print(slices);
     });
 
   }

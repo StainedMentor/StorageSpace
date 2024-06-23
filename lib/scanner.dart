@@ -60,11 +60,12 @@ String? getDesktopDirectory() {
 }
 
 // Function to format bytes into human-readable format
-String formatBytes(int bytes, int decimals) {
+String formatBytes(int bytes, int decimals, ) {
+  const base = 1000;
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB"];
-  int i = (log(bytes) / log(1024)).floor(); // Calculate log base 1024
-  double num = bytes / pow(1024, i);
+  int i = (log(bytes) / log(base)).floor(); // Calculate log base 1024
+  double num = bytes / pow(base, i);
   return "${num.toStringAsFixed(decimals)} ${suffixes[i]}";
 }
 
@@ -141,14 +142,17 @@ class FolderSizeCalculator {
         ));
         totalSize += size;
 
-      } else if (entity is Directory) {
+      } else if (entity is Link) {
+        
+      }
+       else if (entity is Directory) {
         try {
-        FileSystemNode child = await _mapDirectory(entity);
-        children.add(child);
-        totalSize +=  child.size!;
-        }catch (e) {
-    print('Failed to access the directory: $e');
-  }
+          FileSystemNode child = await _mapDirectory(entity);
+          children.add(child);
+          totalSize +=  child.size!;
+        } catch (e) {
+          print('Failed to access the directory: $e');
+        }
       }
     }
     var outNode = FileSystemNode(
@@ -165,6 +169,8 @@ class FolderSizeCalculator {
     return  outNode;
   }
 }
+
+
 
 
   List<Color> generateGradientColors(int numSteps) {

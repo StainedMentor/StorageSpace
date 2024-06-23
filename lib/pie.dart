@@ -62,7 +62,6 @@ class _PieChartState extends State<PieChart> {
 
       _hoverPosition =  position - globalOffset;
 
-      print(position);
     });
   }
 
