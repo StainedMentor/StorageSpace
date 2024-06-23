@@ -75,8 +75,7 @@ class _PieChartState extends State<PieChart> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-                        alignment: Alignment.center,
-                        fit: StackFit.loose,
+      alignment: Alignment.center,
 
       children: [
         // Pie slices

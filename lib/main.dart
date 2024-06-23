@@ -95,7 +95,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> prepareSliceData() async {
 
-    base.children.sort((a, b) => a.size.compareTo(b.size));
+    base.children.sort((b, a) => a.size.compareTo(b.size));
 
 
     List<PieSliceData> tempList = [];
@@ -123,7 +123,7 @@ class _MyAppState extends State<MyApp> {
 
     setState(() {
           slices = tempList;
-
+print(slices);
     });
 
   }
