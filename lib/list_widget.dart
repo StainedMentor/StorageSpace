@@ -5,8 +5,9 @@ import 'package:storagespace/scanner.dart';
 
 class FileSystemWidget extends StatefulWidget {
   final List<FileSystemNode> nodes;
+  final ValueChanged<List<FileSystemNode>> changeCallback;
 
-  FileSystemWidget({Key? key, required this.nodes}) : super(key: key);
+  FileSystemWidget({Key? key, required this.nodes, required this.changeCallback}) : super(key: key);
 
   @override
   _FileSystemWidgetState createState() => _FileSystemWidgetState();
@@ -128,6 +129,7 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
     for (var node in currentPath) {
       pathNames.add(node.name);
     }
+    widget.changeCallback(currentPath);
     setState(() {
       currentPathString = pathNames.join(' > ');
     });

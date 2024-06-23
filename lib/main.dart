@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
         Row(
           children: [
             Expanded(child: 
-            FileSystemWidget(nodes: filelist)),
+            FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList)),
 
             Expanded(child: 
                   Padding(padding: EdgeInsets.all(40),
@@ -67,6 +67,18 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+  void changeFolderInList(List<FileSystemNode> nodePath) {
+    if (base != null){
+
+      while(base.parent != null) {
+        base = base.parent!;
+      }
+      for (FileSystemNode node in nodePath){
+        base = base.children.firstWhere((element) => element == node);
+      }
+      prepareSliceData();
+    }
+  }
   void exitFolder() {
     if (base != null){
     if (base.parent != null){
@@ -77,9 +89,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   void sliceClicked(int index){
-    base = base.children[index];
-    
-    prepareSliceData();
+    if (!base.children.isEmpty){
+      base = base.children[index];
+      
+      prepareSliceData();
+    }
   }
 
   void readyMap() async {
