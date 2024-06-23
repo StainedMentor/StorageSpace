@@ -6,8 +6,10 @@ import 'package:storagespace/scanner.dart';
 class FileSystemWidget extends StatefulWidget {
   final List<FileSystemNode> nodes;
   final ValueChanged<List<FileSystemNode>> changeCallback;
+  List<FileSystemNode> currentPath;
 
-  FileSystemWidget({Key? key, required this.nodes, required this.changeCallback}) : super(key: key);
+
+  FileSystemWidget({super.key, required this.nodes, required this.changeCallback, required this.currentPath});
 
   @override
   _FileSystemWidgetState createState() => _FileSystemWidgetState();
@@ -15,8 +17,10 @@ class FileSystemWidget extends StatefulWidget {
 
 class _FileSystemWidgetState extends State<FileSystemWidget> {
   // Current path in the file system as list of nodes
-  List<FileSystemNode> currentPath = [];
+  List<FileSystemNode> _currentPath = [];
+
   String currentPathString = '';
+  
 
 
   ScrollController _scrollController = ScrollController();
@@ -53,12 +57,14 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
     // Root column
     columns.add(_buildNodeList(currentLevel, 'Root'));
 
+
     // Add columns for each level in the current path
-    for (var i = 0; i < currentPath.length; i++) {
-      var node = currentPath[i];
+    for (var i = 0; i < _currentPath.length; i++) {
+      var node = _currentPath[i];
       node.children.sort((b, a) => a.size.compareTo(b.size));
 
       columns.add(_buildNodeList(node.children, node.name));
+
     }
 
     // Add scrolling horizontally
@@ -83,14 +89,18 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                int index = currentPath.indexWhere((element) => element.name == columnTitle);
+                int index = widget.currentPath.indexWhere((element) => element.name == columnTitle);
 
                 if (index != -1) {
-                  currentPath = currentPath.sublist(0, index+1);
+                  widget.currentPath = widget.currentPath.sublist(0, index+1);
                 } else {
-                  currentPath.clear();
+                  widget.currentPath.clear();
                 }
+
+                _currentPath = widget.currentPath;
+                widget.changeCallback(widget.currentPath);
                 _updatePathString();
+
                
               });
             },
@@ -114,9 +124,13 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
         if (!node.isFile) {
           setState(() {
             // When a directory is clicked, set the current path to include only up to this directory
-            int index = currentPath.indexWhere((element) => element == node.parent);
-            currentPath = currentPath.sublist(0, index + 1);
-            currentPath.add(node);
+            int index = widget.currentPath.indexWhere((element) => element == node.parent);
+            widget.currentPath = widget.currentPath.sublist(0, index + 1);
+            widget.currentPath.add(node);
+
+
+            _currentPath = widget.currentPath;
+            widget.changeCallback(widget.currentPath);
             _updatePathString();
 
           });
@@ -126,12 +140,15 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   }
     void _updatePathString() {
     List<String> pathNames = ['Root'];
-    for (var node in currentPath) {
+    for (var node in _currentPath) {
       pathNames.add(node.name);
     }
-    widget.changeCallback(currentPath);
     setState(() {
       currentPathString = pathNames.join(' > ');
+
     });
+
   }
+
+
 }

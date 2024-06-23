@@ -27,6 +27,8 @@ class _MyAppState extends State<MyApp> {
   List<FileSystemNode> filelist = [];
 
   GlobalKey key = GlobalKey();
+  List<FileSystemNode> currentPath = [];
+
 
   @override
   void initState() {
@@ -45,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         Row(
           children: [
             Expanded(child: 
-            FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList)),
+            FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
 
             Expanded(child: 
                   Padding(padding: EdgeInsets.all(40),
@@ -68,6 +70,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
   void changeFolderInList(List<FileSystemNode> nodePath) {
+    currentPath = nodePath;
     if (base != null){
 
       while(base.parent != null) {
@@ -77,6 +80,7 @@ class _MyAppState extends State<MyApp> {
         base = base.children.firstWhere((element) => element == node);
       }
       prepareSliceData();
+      
     }
   }
   void exitFolder() {
@@ -84,6 +88,7 @@ class _MyAppState extends State<MyApp> {
     if (base.parent != null){
     base = base.parent!;
     prepareSliceData();
+    currentPath.removeLast();
     }
     }
   }
@@ -91,8 +96,10 @@ class _MyAppState extends State<MyApp> {
   void sliceClicked(int index){
     if (!base.children.isEmpty){
       base = base.children[index];
+
       
       prepareSliceData();
+      currentPath.add(base);
     }
   }
 
