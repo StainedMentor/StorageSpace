@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   ];
 
   FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
-  late FileSystemNode base;
+  FileSystemNode base = FileSystemNode(name: "root", isFile: true, size: 0);
   List<FileSystemNode> filelist = [];
 
   GlobalKey key = GlobalKey();
@@ -58,18 +58,9 @@ class _MyAppState extends State<MyApp> {
                           sliceClicked(index);
                         },
                         key: key,
+                        exitFolder: exitFolder
                       ),
                     
-                    FloatingActionButton(
-                        onPressed: () {
-                          if (base.parent != null){
-                          base = base.parent!;
-                          prepareSliceData();
-                          }
-
-                        },
-                        child: Icon(Icons.add),
-                      ),
                   ],
                 ),
               
@@ -78,6 +69,14 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+  void exitFolder() {
+    if (base != null){
+    if (base.parent != null){
+    base = base.parent!;
+    prepareSliceData();
+    }
+    }
   }
 
   void sliceClicked(int index){

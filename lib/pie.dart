@@ -23,12 +23,14 @@ class PieChart extends StatefulWidget {
   final double radius;
   final ValueChanged<int> onPressed;
   final GlobalKey key;
+  final VoidCallback exitFolder;
 
   PieChart({
     required this.slices,
     required this.radius,
     required this.onPressed, 
-    required this.key,
+    required this.key, 
+    required this.exitFolder,
   });
 
   @override
@@ -73,9 +75,21 @@ class _PieChartState extends State<PieChart> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+                        alignment: Alignment.center,
+                        fit: StackFit.loose,
+
       children: [
         // Pie slices
         ..._buildPieSlices(),
+        Positioned(
+          width: 50,
+          height: 50,
+          child: 
+        
+        FloatingActionButton(
+          onPressed: widget.exitFolder,
+          child: Icon(Icons.add),
+        ),),
         // Hover text
         if (_hoveredIndex != null)
           Positioned(
