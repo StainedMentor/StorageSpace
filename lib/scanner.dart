@@ -61,7 +61,10 @@ String? getDesktopDirectory() {
 
 // Function to format bytes into human-readable format
 String formatBytes(int bytes, int decimals, ) {
-  const base = 1000;
+  var base = 1000;
+  if (Platform.isWindows){
+    base = 1024;
+  }
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB"];
   int i = (log(bytes) / log(base)).floor(); // Calculate log base 1024

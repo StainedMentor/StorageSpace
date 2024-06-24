@@ -22,12 +22,14 @@ class _MyAppState extends State<MyApp> {
     PieSliceData(color: Colors.red, percentage: 0.35, label: 'Smaller files', value: 1),
   ];
 
-  FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
+  FolderSizeCalculator scanner = FolderSizeCalculator(getRootPath()!);
   FileSystemNode base = FileSystemNode(name: "root", isFile: true, size: 0);
   List<FileSystemNode> filelist = [];
 
   GlobalKey key = GlobalKey();
   List<FileSystemNode> currentPath = [];
+
+  var statusText = "Scanning drive...";
 
 
   @override
@@ -48,8 +50,11 @@ class _MyAppState extends State<MyApp> {
           children: [
             Expanded(child: 
             FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
-
             Expanded(child: 
+            Column(
+              children: [
+            Expanded(
+              child: 
                   Padding(padding: EdgeInsets.all(40),
                   child: 
                     PieChart(
@@ -63,7 +68,13 @@ class _MyAppState extends State<MyApp> {
                       ),
                   )
                 
-            )
+            ),
+            Container(
+              width: 200,
+              height: 50,
+              child: 
+            Text(statusText))
+            ]))
           ]
         ),
       ),
@@ -106,6 +117,9 @@ class _MyAppState extends State<MyApp> {
   void readyMap() async {
     base = await scanner.mapFileSystem();
     filelist = base.children;
+    setState(() {
+      statusText = "All done!";
+    });
 
         prepareSliceData();
   }
