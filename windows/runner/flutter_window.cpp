@@ -3,6 +3,8 @@
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+#include <shellapi.h>
+
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
@@ -25,6 +27,28 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+
+  flutter::MethodChannel<> channel(
+        flutter_controller_->engine()->messenger(), "samples.flutter.dev/finder",
+        &flutter::StandardMethodCodec::GetInstance());
+    channel.SetMethodCallHandler(
+        [](const auto &call, auto result) {
+            const auto *args = std::get_if<flutter::EncodableMap>(call.arguments());
+            if (args) {
+              auto path = std::get_if<std::string>(&(args->at(flutter::EncodableValue("path"))));
+              if (path) {
+                plugin_pointer->RevealInFileSystem(*path);
+                result->Success(nullptr);
+              } else {
+                result->Error("INVALID_ARGUMENT", "Path not provided");
+              }
+            } else {
+              result->Error("INVALID_ARGUMENT", "Path not provided");
+            }
+  
+        });
+
+
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -37,6 +61,10 @@ bool FlutterWindow::OnCreate() {
   flutter_controller_->ForceRedraw();
 
   return true;
+}
+void RevealInFileSystem(const std::string &path) {
+  const std::wstring wpath(path.begin(), path.end());
+  ShellExecute(NULL, L"open", L"explorer.exe", (L"/select,\"" + wpath + L"\"").c_str(), NULL, SW_SHOWNORMAL);
 }
 
 void FlutterWindow::OnDestroy() {
