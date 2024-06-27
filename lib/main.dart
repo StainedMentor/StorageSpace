@@ -109,10 +109,19 @@ class _MyAppState extends State<MyApp> {
   }
 
   void readyMap() async {
+  scanner.fileCountStream.listen((count) {
+    setState(() {
+      
+      statusText = formatBytes(count, 2);
+            statusText = "Total scanned: ${formatBytes(count, 2)}";
+
+    });
+  });
+
     base = await scanner.mapFileSystem();
     filelist = base.children;
     setState(() {
-      statusText = "All done!";
+      statusText = "All done! Total scanned: ${formatBytes(scanner.totalScanned, 2)}";
     });
 
     prepareSliceData();

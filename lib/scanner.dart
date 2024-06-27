@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'dart:developer' as developer;
@@ -55,12 +57,15 @@ class FileSystemNode {
   }
 }
 
-
-/// Class for controlling the mapping process of the file system
 class FolderSizeCalculator {
   final String folderPath;
+  final StreamController<int> _fileCountController = StreamController<int>();
 
   FolderSizeCalculator(this.folderPath);
+
+  /// Stream of the current total files scanned
+  Stream<int> get fileCountStream => _fileCountController.stream;
+  int totalScanned = 0; // Track the number of files scanned
 
   Future<FileSystemNode> mapFileSystem() async {
     final directory = Directory(folderPath);
@@ -69,7 +74,8 @@ class FolderSizeCalculator {
     }
     var topNode = await _mapDirectory(directory);
     topNode.name = folderPath;
-    return  topNode;
+    _fileCountController.close(); // Close the stream controller when done
+    return topNode;
   }
 
   Future<FileSystemNode> _mapDirectory(Directory directory) async {
@@ -78,13 +84,10 @@ class FolderSizeCalculator {
 
     await for (FileSystemEntity entity in directory.list(recursive: false, followLinks: false)) {
       if (entity is File) {
-        
         var size = 0;
-        // windows throws errors when reading file length of open files
         try {
           size = await entity.length();
-        }
-        catch (e) {
+        } catch (e) {
           developer.log(e.toString());
         }
 
@@ -94,15 +97,18 @@ class FolderSizeCalculator {
           size: size,
         ));
         totalSize += size;
+        totalScanned+= size; // Increment file count
+
+        // Emit the updated file count
+        _fileCountController.add(totalScanned);
 
       } else if (entity is Link) {
-        
-      }
-       else if (entity is Directory) {
+        // Handle links if necessary
+      } else if (entity is Directory) {
         try {
           FileSystemNode child = await _mapDirectory(entity);
           children.add(child);
-          totalSize +=  child.size;
+          totalSize += child.size;
         } catch (e) {
           developer.log('Failed to access the directory: $e');
         }
@@ -110,22 +116,25 @@ class FolderSizeCalculator {
     }
 
     var outNode = FileSystemNode(
-      name: directory.uri.pathSegments.isEmpty ? directory.path : directory.uri.pathSegments[directory.uri.pathSegments.length-2],
+      name: directory.uri.pathSegments.isEmpty ? directory.path : directory.uri.pathSegments[directory.uri.pathSegments.length - 2],
       isFile: false,
       size: totalSize,
     );
 
-    for (int i=0; i< children.length; i++){
+    for (int i = 0; i < children.length; i++) {
       children[i].parent = outNode;
     }
 
     outNode.children = children;
 
-    return  outNode;
+    return outNode;
+  }
+
+  // Dispose method to clean up the stream controller if needed
+  void dispose() {
+    _fileCountController.close();
   }
 }
-
-
 
 // UTILITY Functions
 

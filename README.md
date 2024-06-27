@@ -14,12 +14,12 @@ The main target platforms are windows and macos.
 - List view of the file system 
 - Interactive pie chart for the current folder
 - Reveal in file system on macos
+- Active Progress of scanning
 
 
 ## Future features
 
 - Reveal in file system on windows
 - Collector preview
-- Active Progress of scanning
 - Selecting root folder for scanning
 - Deleting items via collector
