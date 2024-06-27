@@ -1,81 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+
 import 'dart:io';
 import 'dart:math';
 
 
-String? getRootPath() {
-      if (Platform.isMacOS || Platform.isLinux) {
-      return "/";
-    } 
-    else if (Platform.isWindows) {
-      return "C: ";
-    }
-    else {
-      return null;
-    }
-
-}
-
-
-// Function to get the path of the Desktop directory
-String? getDesktopDirectory() {
-  try {
-    String? home = "";
-    String? desktopPath;
-
-    Map<String, String> envVars = Platform.environment;
-    if (Platform.isMacOS || Platform.isLinux) {
-      home = envVars['HOME'];
-    } 
-    else if (Platform.isWindows) {
-      home = envVars['UserProfile'];
-    }
-    else {
-      return null;
-    }
-
-    print("Home path: $home");
-    
-
-  if (Platform.isWindows) {
-    desktopPath = '$home\\Desktop';
-  } else if (Platform.isMacOS || Platform.isLinux) {
-    desktopPath = '$home/Desktop';
-  } else {
-    return null;
-  }
-
-    // Check if the directory exists
-    if (Directory(desktopPath).existsSync()) {
-      return desktopPath;
-    } else {
-      print("Desktop directory does not exist.");
-      return null;
-    }
-  } catch (e) {
-    print("Error locating Desktop folder: $e");
-    return null;
-  }
-}
-
-// Function to format bytes into human-readable format
-String formatBytes(int bytes, int decimals, ) {
-  var base = 1000;
-  if (Platform.isWindows){
-    base = 1024;
-  }
-  if (bytes <= 0) return "0 B";
-  const suffixes = ["B", "KB", "MB", "GB", "TB"];
-  int i = (log(bytes) / log(base)).floor(); // Calculate log base 1024
-  double num = bytes / pow(base, i);
-  return "${num.toStringAsFixed(decimals)} ${suffixes[i]}";
-}
-
-
-
-
-
+/// Class used to create tree nodes of the file system
 class FileSystemNode {
   String name;
   final bool isFile;
@@ -103,27 +34,29 @@ class FileSystemNode {
     final result = StringBuffer('$indentStr$type: $name$sizeStr\n');
     if (children != null) {
       for (var child in children!) {
-        result.write(child._toString(indent + 1));
+        result.write(child.name);
       }
     }
     return result.toString();
   }
+
   String getFullPath() {
-    var path = "";
+    var fullPath = "";
     var currentNode = this;
-    while (currentNode.parent != null){
-      path = "/" + currentNode.name + path;
+
+    while (currentNode.parent != null) {
+      fullPath = path.join(currentNode.name, fullPath);
       currentNode = currentNode.parent!;
     }
-          path = "/" + currentNode.name + path;
 
+    fullPath = path.join(currentNode.name, fullPath);
 
-    print(path);
-    return path;
+    return fullPath;
   }
 }
 
 
+/// Class for controlling the mapping process of the file system
 class FolderSizeCalculator {
   final String folderPath;
 
@@ -147,12 +80,14 @@ class FolderSizeCalculator {
       if (entity is File) {
         
         var size = 0;
+        // windows throws errors when reading file length of open files
         try {
           size = await entity.length();
         }
         catch (e) {
           print(e);
         }
+
         children.add(FileSystemNode(
           name: entity.uri.pathSegments.last,
           isFile: true,
@@ -173,15 +108,17 @@ class FolderSizeCalculator {
         }
       }
     }
+
     var outNode = FileSystemNode(
       name: directory.uri.pathSegments.isEmpty ? directory.path : directory.uri.pathSegments[directory.uri.pathSegments.length-2],
       isFile: false,
       size: totalSize,
     );
+
     for (int i=0; i< children.length; i++){
       children[i].parent = outNode;
-      
     }
+
     outNode.children = children;
 
     return  outNode;
@@ -190,15 +127,93 @@ class FolderSizeCalculator {
 
 
 
+// UTILITY Functions
 
-  List<Color> generateGradientColors(int numSteps) {
-    List<Color> colors = [];
 
-    for (int i = 0; i < numSteps; i++) {
-      double hue = (i * 360 / numSteps) % 360;
-      Color color = HSVColor.fromAHSV(1.0, hue, 1.0, 1.0).toColor();
-      colors.add(color);
+
+  /// Returns the root path for current platform
+String? getRootPath() {
+  if (Platform.isMacOS || Platform.isLinux) {
+    return "/";
+  } 
+  else if (Platform.isWindows) {
+    return "C: ";
+  }
+  else {
+    return null;
+  }
+}
+
+
+/// Function to get the path of the Desktop directory for the current platform
+/// 
+/// This function assumes that desktop is always a subfolder of the homepath
+String? getDesktopDirectory() {
+  try {
+    String? home = "";
+    String? desktopPath;
+
+    Map<String, String> envVars = Platform.environment;
+    if (Platform.isMacOS || Platform.isLinux) {
+      home = envVars['HOME'];
+    } 
+    else if (Platform.isWindows) {
+      home = envVars['UserProfile'];
+    }
+    else {
+      return null;
     }
 
-    return colors;
+    print("Home path: $home");
+    
+
+    if (Platform.isWindows) {
+      desktopPath = '$home\\Desktop';
+    } else if (Platform.isMacOS || Platform.isLinux) {
+      desktopPath = '$home/Desktop';
+    } else {
+      return null;
+    }
+
+    // Check if the directory exists
+    if (Directory(desktopPath).existsSync()) {
+      return desktopPath;
+    } else {
+      print("Desktop directory does not exist.");
+      return null;
+    }
+  } catch (e) {
+    print("Error locating Desktop folder: $e");
+    return null;
   }
+}
+
+/// Function to format bytes into highest order unit
+/// 
+/// The base for the conversion is adjusted for the current platform
+String formatBytes(int bytes, int decimals, ) {
+  var base = 1000;
+  if (Platform.isWindows){
+    base = 1024;
+  }
+  if (bytes <= 0) return "0 B";
+  const suffixes = ["B", "KB", "MB", "GB", "TB"];
+  int i = (log(bytes) / log(base)).floor(); 
+  double num = bytes / pow(base, i);
+  return "${num.toStringAsFixed(decimals)} ${suffixes[i]}";
+}
+
+
+/// Return a list of different colors
+List<Color> generateGradientColors(int numSteps) {
+  List<Color> colors = [];
+
+  for (int i = 0; i < numSteps; i++) {
+    double hue = i.toDouble()/numSteps*360;
+    print(hue);
+    Color color = HSVColor.fromAHSV(1.0, hue, 1.0, 1.0).toColor();
+    colors.add(color);
+  }
+
+  return colors;
+}
