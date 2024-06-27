@@ -3,6 +3,13 @@
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+
+#include <flutter/event_channel.h>
+#include <flutter/event_sink.h>
+#include <flutter/event_stream_handler_functions.h>
+#include <flutter/method_channel.h>
+#include <flutter/standard_method_codec.h>
+#include <windows.h>
 #include <shellapi.h>
 
 
@@ -10,6 +17,10 @@ FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
 
 FlutterWindow::~FlutterWindow() {}
+void RevealInFileSystem(const std::string &path) {
+  const std::wstring wpath(path.begin(), path.end());
+  ShellExecute(NULL, L"open", L"explorer.exe", (L"/select,\"" + wpath + L"\"").c_str(), NULL, SW_SHOWNORMAL);
+}
 
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
@@ -37,7 +48,7 @@ bool FlutterWindow::OnCreate() {
             if (args) {
               auto path = std::get_if<std::string>(&(args->at(flutter::EncodableValue("path"))));
               if (path) {
-                plugin_pointer->RevealInFileSystem(*path);
+                RevealInFileSystem(*path);
                 result->Success(nullptr);
               } else {
                 result->Error("INVALID_ARGUMENT", "Path not provided");
@@ -62,10 +73,7 @@ bool FlutterWindow::OnCreate() {
 
   return true;
 }
-void RevealInFileSystem(const std::string &path) {
-  const std::wstring wpath(path.begin(), path.end());
-  ShellExecute(NULL, L"open", L"explorer.exe", (L"/select,\"" + wpath + L"\"").c_str(), NULL, SW_SHOWNORMAL);
-}
+
 
 void FlutterWindow::OnDestroy() {
   if (flutter_controller_) {
