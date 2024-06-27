@@ -77,7 +77,7 @@ String formatBytes(int bytes, int decimals, ) {
 
 
 class FileSystemNode {
-  final String name;
+  String name;
   final bool isFile;
   final int size;
   List<FileSystemNode> children = [];
@@ -108,6 +108,19 @@ class FileSystemNode {
     }
     return result.toString();
   }
+  String getFullPath() {
+    var path = "";
+    var currentNode = this;
+    while (currentNode.parent != null){
+      path = "/" + currentNode.name + path;
+      currentNode = currentNode.parent!;
+    }
+          path = "/" + currentNode.name + path;
+
+
+    print(path);
+    return path;
+  }
 }
 
 
@@ -121,7 +134,9 @@ class FolderSizeCalculator {
     if (!await directory.exists()) {
       throw Exception("Directory does not exist");
     }
-    return await _mapDirectory(directory);
+    var topNode = await _mapDirectory(directory);
+    topNode.name = folderPath;
+    return  topNode;
   }
 
   Future<FileSystemNode> _mapDirectory(Directory directory) async {

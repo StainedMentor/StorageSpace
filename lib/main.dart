@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     PieSliceData(color: Colors.red, percentage: 0.35, label: 'Smaller files', value: 1),
   ];
 
-  FolderSizeCalculator scanner = FolderSizeCalculator(getRootPath()!);
+  FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
   FileSystemNode base = FileSystemNode(name: "root", isFile: true, size: 0);
   List<FileSystemNode> filelist = [];
 

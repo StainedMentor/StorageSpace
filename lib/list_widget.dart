@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:storagespace/scanner.dart';
 
 
@@ -117,7 +118,14 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   }
 
   Widget _buildNodeWidget(FileSystemNode node) {
-    return ListTile(
+
+
+    return     GestureDetector(
+            onSecondaryTapUp: (details) {
+                _showContextMenu(context, node, details);
+
+            },
+            child:  ListTile(
       title: Text(node.name),
       trailing:  Text(formatBytes(node.size, 2)),
       onTap: () {
@@ -136,7 +144,55 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
           });
         }
       },
-    );
+      
+    ));
+    
+    
+  }
+    void _showContextMenu(BuildContext context, FileSystemNode node, TapUpDetails details) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    RenderBox box = context.findRenderObject() as RenderBox;
+    Offset globalOffset =  details.globalPosition;
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        globalOffset & Size(40, 40), // smaller rect, the touch area
+        Offset.zero & overlay.size, // Bigger rect, the entire screen
+      ),
+      items: [
+        PopupMenuItem(
+          child: Text('Open in file system'),
+          value: 0,
+        ),
+        PopupMenuItem(
+          child: Text('Add to collector'),
+          value: 1,
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        _handleContextMenuAction(value, node);
+      }
+    });
+  }
+
+  void _handleContextMenuAction(int action, FileSystemNode node) {
+    if (action == 0) {
+        revealInFileSystem(node.getFullPath());
+    }
+    else {
+
+    }
+  }
+    static const platform = MethodChannel('samples.flutter.dev/finder');
+
+   Future<void> revealInFileSystem(String path) async {
+    try {
+      await platform.invokeMethod('revealInFileSystem', {"path": path});
+    } on PlatformException catch (e) {
+      print("Failed to reveal file: ${e.message}");
+    }
   }
     void _updatePathString() {
     List<String> pathNames = ['Root'];
