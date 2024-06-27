@@ -7,7 +7,7 @@ The main target platforms are windows and macos.
 
 
 
-[demo](https://github.com/StainedMentor/StorageSpace/tree/main/assets/demo.png)
+![demo](https://github.com/StainedMentor/StorageSpace/tree/main/assets/demo.png)
 
 ## Features
 - Calculating folder sizes for all folders
