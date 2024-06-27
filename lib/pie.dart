@@ -25,7 +25,7 @@ class PieChart extends StatefulWidget {
   final GlobalKey key;
   final VoidCallback exitFolder;
 
-  PieChart({
+  const PieChart({
     required this.slices,
     required this.radius,
     required this.onPressed, 
@@ -86,7 +86,7 @@ class _PieChartState extends State<PieChart> {
         
         FloatingActionButton(
           onPressed: widget.exitFolder,
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ),),
         // Hover text
         if (_hoveredIndex != null)
@@ -139,7 +139,7 @@ class _PieChartState extends State<PieChart> {
 Widget _buildHoverText() {
   final hoveredSlice = widget.slices[_hoveredIndex!];
   return Container(
-    padding: EdgeInsets.all(8.0),
+    padding: const EdgeInsets.all(8.0),
     decoration: BoxDecoration(
       color: Colors.black.withOpacity(0.7),
       borderRadius: BorderRadius.circular(8.0),
@@ -149,15 +149,15 @@ Widget _buildHoverText() {
       children: [
         Text(
           'Label: ${hoveredSlice.label}',  
-          style: TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
         Text(
           'Value: ${formatBytes(hoveredSlice.value, 2)}', 
-          style: TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
         Text(
           'Percentage: ${(hoveredSlice.percentage * 100).toStringAsFixed(2)}%', 
-          style: TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
       ],
     ),
@@ -175,14 +175,13 @@ class SliceButton extends StatefulWidget {
 
   
 
-  SliceButton({
+  const SliceButton({super.key, 
     required this.radius,
     required this.startAngle,
     required this.sweepAngle,
     required this.color,
     required this.onPressed,
-        required this.onHover,
-
+    required this.onHover,
   });
 
   @override
@@ -195,7 +194,6 @@ class _SliceButtonState extends State<SliceButton> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     ownRad = widget.radius;
   }
@@ -212,28 +210,30 @@ class _SliceButtonState extends State<SliceButton> {
             radius: ownRad,
           ),
           child:
-          MouseRegion(
-        onEnter: (details)  {
-          _setHover(true, details);
-          setState(() {
-            ownRad = widget.radius + 10;
-          });
-          },
-        onExit: (_) { _setHover(false, null);
-                  setState(() {
-            ownRad = widget.radius;
-          });},
-            
-            child:   
-           CustomPaint(
-            size: Size(ownRad * 2, ownRad * 2),
-            painter: SlicePainter(
-              startAngle: widget.startAngle,
-              sweepAngle: widget.sweepAngle,
-              color: _isHover ? widget.color.withOpacity(0.8) : widget.color,
-            ),
-            
-          ))
+            MouseRegion(
+              onEnter: (details)  {
+                _setHover(true, details);
+                setState(() {
+                  ownRad = widget.radius + 10;
+                });
+                },
+              onExit: (_) { 
+                _setHover(false, null);
+                setState(() {
+                  ownRad = widget.radius;
+                });
+                },
+              
+              child:   
+                CustomPaint(
+                  size: Size(ownRad * 2, ownRad * 2),
+                  painter: SlicePainter(
+                    startAngle: widget.startAngle,
+                    sweepAngle: widget.sweepAngle,
+                    color: _isHover ? widget.color.withOpacity(0.8) : widget.color,
+                  ),
+              
+            ))
       ),
     );
   }

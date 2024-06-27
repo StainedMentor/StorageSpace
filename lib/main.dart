@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:storagespace/list_widget.dart';
 import 'package:storagespace/pie.dart';
 import 'scanner.dart';
@@ -43,38 +42,39 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Storage Space'),
+          title: const Text('Storage Space'),
         ),
         body: 
         Row(
           children: [
             Expanded(child: 
-            FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
+              FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
             Expanded(child: 
-            Column(
-              children: [
-            Expanded(
-              child: 
-                  Padding(padding: EdgeInsets.all(40),
-                  child: 
-                    PieChart(
-                        slices: slices,
-                        radius: 150,
-                        onPressed: (int index) {
-                          sliceClicked(index);
-                        },
-                        key: key,
-                        exitFolder: exitFolder
-                      ),
-                  )
-                
-            ),
-            Container(
-              width: 200,
-              height: 50,
-              child: 
-            Text(statusText))
-            ]))
+              Column(
+                children: [
+                  Expanded(
+                    child: 
+                      Padding(padding: const EdgeInsets.all(40),
+                      child: 
+                        PieChart(
+                          slices: slices,
+                          radius: 150,
+                          onPressed: (int index) {
+                            sliceClicked(index);
+                          },
+                          key: key,
+                          exitFolder: exitFolder
+                        ),
+                      )
+                      
+                  ),
+                  
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: 
+                  Text(statusText))
+              ]))
           ]
         ),
       ),
@@ -82,33 +82,27 @@ class _MyAppState extends State<MyApp> {
   }
   void changeFolderInList(List<FileSystemNode> nodePath) {
     currentPath = nodePath;
-    if (base != null){
-
-      while(base.parent != null) {
-        base = base.parent!;
-      }
-      for (FileSystemNode node in nodePath){
-        base = base.children.firstWhere((element) => element == node);
-      }
-      prepareSliceData();
-      
+    while(base.parent != null) {
+      base = base.parent!;
     }
-  }
-  void exitFolder() {
-    if (base != null){
-    if (base.parent != null){
-    base = base.parent!;
+    for (FileSystemNode node in nodePath){
+      base = base.children.firstWhere((element) => element == node);
+    }
     prepareSliceData();
-    currentPath.removeLast();
+    
     }
+  void exitFolder() {
+    if (base.parent != null){
+      base = base.parent!;
+      prepareSliceData();
+      currentPath.removeLast();
     }
   }
 
   void sliceClicked(int index){
-    if (!base.children.isEmpty){
+    if (base.children.isNotEmpty){
       base = base.children[index];
 
-      
       prepareSliceData();
       currentPath.add(base);
     }
@@ -121,7 +115,7 @@ class _MyAppState extends State<MyApp> {
       statusText = "All done!";
     });
 
-        prepareSliceData();
+    prepareSliceData();
   }
 
 
@@ -148,13 +142,13 @@ class _MyAppState extends State<MyApp> {
         tempList.add(PieSliceData(color: colors[i], percentage:  slicePercent, label: base.children[i].name, value: base.children[i].size));
 
       }
-        tempList.add(PieSliceData(color: colors[35], percentage:  1-totalPercent, label: 'Smaller files', value: 1));
+      tempList.add(PieSliceData(color: colors[35], percentage:  1-totalPercent, label: 'Smaller files', value: 1));
 
     }
 
 
     setState(() {
-          slices = tempList;
+      slices = tempList;
     });
 
   }

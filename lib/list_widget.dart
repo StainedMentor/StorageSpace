@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:storagespace/scanner.dart';
+import 'dart:developer' as developer;
+
 
 
 
@@ -21,15 +23,15 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   List<FileSystemNode> _currentPath = [];
 
   String currentPathString = '';
-  
 
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+    
   }
 
   @override
@@ -69,10 +71,10 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
     }
 
     // Add scrolling horizontally
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
@@ -83,7 +85,7 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   Widget _buildNodeList(List<FileSystemNode> nodes, String columnTitle) {
     return Container(
       width: 300, 
-      margin: EdgeInsets.only(right: 4.0), 
+      margin: const EdgeInsets.only(right: 4.0), 
       child: Column(
         children: [
           // close button
@@ -151,23 +153,22 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   }
     void _showContextMenu(BuildContext context, FileSystemNode node, TapUpDetails details) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    RenderBox box = context.findRenderObject() as RenderBox;
     Offset globalOffset =  details.globalPosition;
 
     showMenu(
       context: context,
       position: RelativeRect.fromRect(
-        globalOffset & Size(40, 40), // smaller rect, the touch area
+        globalOffset & const Size(40, 40), // smaller rect, the touch area
         Offset.zero & overlay.size, // Bigger rect, the entire screen
       ),
       items: [
-        PopupMenuItem(
-          child: Text('Open in file system'),
+        const PopupMenuItem(
           value: 0,
+          child: Text('Open in file system'),
         ),
-        PopupMenuItem(
-          child: Text('Add to collector'),
+        const PopupMenuItem(
           value: 1,
+          child: Text('Add to collector'),
         ),
       ],
     ).then((value) {
@@ -191,7 +192,7 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
     try {
       await platform.invokeMethod('revealInFileSystem', {"path": path});
     } on PlatformException catch (e) {
-      print("Failed to reveal file: ${e.message}");
+      developer.log("Failed to reveal file: ${e.message}");
     }
   }
     void _updatePathString() {

@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
+import 'dart:developer' as developer;
+
 
 import 'dart:io';
 import 'dart:math';
@@ -12,7 +14,7 @@ class FileSystemNode {
   final bool isFile;
   final int size;
   List<FileSystemNode> children = [];
-  FileSystemNode? parent = null;
+  FileSystemNode? parent;
 
   FileSystemNode({
     required this.name,
@@ -30,14 +32,12 @@ class FileSystemNode {
   String _toString(int indent) {
     final indentStr = '  ' * indent;
     final type = isFile ? 'File' : 'Folder';
-    final sizeStr = isFile ? ' (${size} bytes)' : '';
+    final sizeStr = isFile ? ' ($size bytes)' : '';
     final result = StringBuffer('$indentStr$type: $name$sizeStr\n');
-    if (children != null) {
-      for (var child in children!) {
-        result.write(child.name);
-      }
+    for (var child in children) {
+      result.write(child.name);
     }
-    return result.toString();
+      return result.toString();
   }
 
   String getFullPath() {
@@ -85,7 +85,7 @@ class FolderSizeCalculator {
           size = await entity.length();
         }
         catch (e) {
-          print(e);
+          developer.log(e.toString());
         }
 
         children.add(FileSystemNode(
@@ -102,9 +102,9 @@ class FolderSizeCalculator {
         try {
           FileSystemNode child = await _mapDirectory(entity);
           children.add(child);
-          totalSize +=  child.size!;
+          totalSize +=  child.size;
         } catch (e) {
-          print('Failed to access the directory: $e');
+          developer.log('Failed to access the directory: $e');
         }
       }
     }
@@ -164,7 +164,7 @@ String? getDesktopDirectory() {
       return null;
     }
 
-    print("Home path: $home");
+    developer.log("Home path: $home");
     
 
     if (Platform.isWindows) {
@@ -179,11 +179,11 @@ String? getDesktopDirectory() {
     if (Directory(desktopPath).existsSync()) {
       return desktopPath;
     } else {
-      print("Desktop directory does not exist.");
+      developer.log("Desktop directory does not exist.");
       return null;
     }
   } catch (e) {
-    print("Error locating Desktop folder: $e");
+    developer.log("Error locating Desktop folder: $e");
     return null;
   }
 }
@@ -210,7 +210,6 @@ List<Color> generateGradientColors(int numSteps) {
 
   for (int i = 0; i < numSteps; i++) {
     double hue = i.toDouble()/numSteps*360;
-    print(hue);
     Color color = HSVColor.fromAHSV(1.0, hue, 1.0, 1.0).toColor();
     colors.add(color);
   }
