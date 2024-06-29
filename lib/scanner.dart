@@ -73,6 +73,7 @@ class FolderSizeCalculator {
       throw Exception("Directory does not exist");
     }
     var topNode = await _mapDirectory(directory);
+    
     topNode.name = folderPath;
     _fileCountController.close(); // Close the stream controller when done
     return topNode;
@@ -82,38 +83,48 @@ class FolderSizeCalculator {
     final List<FileSystemNode> children = [];
     int totalSize = 0;
 
-    await for (FileSystemEntity entity in directory.list(recursive: false, followLinks: false)) {
-      if (entity is File) {
-        var size = 0;
-        try {
-          size = await entity.length();
-        } catch (e) {
-          developer.log(e.toString());
-        }
+    final List<Future> tasks = [];
+await for (FileSystemEntity entity in directory.list(recursive: false, followLinks: false)) {
+      if (entity is Link) {
 
-        children.add(FileSystemNode(
-          name: entity.uri.pathSegments.last,
-          isFile: true,
-          size: size,
-        ));
-        totalSize += size;
-        totalScanned+= size; // Increment file count
+      }
+      else if (entity is File) {
+        tasks.add(() async {
+          var size = 0;
+          try {
+            size = await entity.length();
+          } catch (e) {
+            developer.log(e.toString());
+          }
 
-        // Emit the updated file count
-        _fileCountController.add(totalScanned);
+          children.add(FileSystemNode(
+            name: entity.uri.pathSegments.last,
+            isFile: true,
+            size: size,
+          ));
 
-      } else if (entity is Link) {
-        // Handle links if necessary
-      } else if (entity is Directory) {
-        try {
-          FileSystemNode child = await _mapDirectory(entity);
-          children.add(child);
-          totalSize += child.size;
-        } catch (e) {
-          developer.log('Failed to access the directory: $e');
-        }
+          totalSize += size;
+          totalScanned += size;
+
+          // Emit the updated total size
+          _fileCountController.add(totalScanned);
+        }());
+      } else if (entity is Directory) { 
+        tasks.add(() async {
+          if (entity.path != "/System/Volumes"){
+          try {
+            FileSystemNode child = await _mapDirectory(entity);
+            children.add(child);
+            totalSize += child.size;
+          } catch (e) {
+            developer.log('Failed to access the directory: $e');
+          }
+          }
+        }());
       }
     }
+    await Future.wait(tasks);
+
 
     var outNode = FileSystemNode(
       name: directory.uri.pathSegments.isEmpty ? directory.path : directory.uri.pathSegments[directory.uri.pathSegments.length - 2],

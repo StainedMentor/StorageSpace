@@ -4,6 +4,7 @@ import 'package:storagespace/list_widget.dart';
 import 'package:storagespace/pie.dart';
 import 'scanner.dart';
 
+
 void main() {
   runApp(MyApp());
 }
@@ -21,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     PieSliceData(color: Colors.red, percentage: 0.35, label: 'Smaller files', value: 1),
   ];
 
-  FolderSizeCalculator scanner = FolderSizeCalculator(getDesktopDirectory()!);
+  FolderSizeCalculator scanner = FolderSizeCalculator(getRootPath()!);
   FileSystemNode base = FileSystemNode(name: "root", isFile: true, size: 0);
   List<FileSystemNode> filelist = [];
 
