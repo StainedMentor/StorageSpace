@@ -58,16 +58,17 @@ class FileSystemNode {
 }
 
 class FolderSizeCalculator {
-  final String folderPath;
+  String folderPath;
   final StreamController<int> _fileCountController = StreamController<int>();
 
   FolderSizeCalculator(this.folderPath);
 
-  /// Stream of the current total files scanned
+  // Stream of the current total files scanned
   Stream<int> get fileCountStream => _fileCountController.stream;
   int totalScanned = 0; // Track the number of files scanned
 
   Future<FileSystemNode> mapFileSystem() async {
+    totalScanned = 0;
     final directory = Directory(folderPath);
     if (!await directory.exists()) {
       throw Exception("Directory does not exist");
@@ -75,7 +76,7 @@ class FolderSizeCalculator {
     var topNode = await _mapDirectory(directory);
     
     topNode.name = folderPath;
-    _fileCountController.close(); // Close the stream controller when done
+    // _fileCountController.close(); // Close the stream controller when done
     return topNode;
   }
 

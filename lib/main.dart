@@ -2,11 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:storagespace/list_widget.dart';
 import 'package:storagespace/pie.dart';
+import 'package:storagespace/side_bar.dart';
 import 'scanner.dart';
 
 
 void main() {
   runApp(MyApp());
+  
 }
 class MyApp extends StatefulWidget {
   @override
@@ -35,19 +37,39 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    readyMap();
+      scanner.fileCountStream.listen((count) {
+    setState(() {
+      
+      statusText = formatBytes(count, 2);
+            statusText = "Total scanned: ${formatBytes(count, 2)}";
+
+    });
+  });
+
   }
 
   @override
   Widget build(BuildContext context) {
+
+
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Storage Space'),
-        ),
+
         body: 
         Row(
           children: [
+
+   
+            SizedBox(
+              width: 200,
+              child: 
+              Sidebar(onFolderSelected: (path) => {
+                scanner.folderPath = path,
+                readyMap()
+              })
+            ),
+            
+
             Expanded(child: 
               FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
             Expanded(child: 
@@ -110,14 +132,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void readyMap() async {
-  scanner.fileCountStream.listen((count) {
-    setState(() {
-      
-      statusText = formatBytes(count, 2);
-            statusText = "Total scanned: ${formatBytes(count, 2)}";
-
-    });
-  });
 
     base = await scanner.mapFileSystem();
     filelist = base.children;
