@@ -7,12 +7,12 @@ import 'dart:developer' as developer;
 
 
 class FileSystemWidget extends StatefulWidget {
-  final List<FileSystemNode> nodes;
+  final FileSystemNode? base;
   final ValueChanged<List<FileSystemNode>> changeCallback;
   List<FileSystemNode> currentPath;
 
 
-  FileSystemWidget({super.key, required this.nodes, required this.changeCallback, required this.currentPath});
+  FileSystemWidget({super.key, required this.base, required this.changeCallback, required this.currentPath});
 
   @override
   _FileSystemWidgetState createState() => _FileSystemWidgetState();
@@ -21,7 +21,7 @@ class FileSystemWidget extends StatefulWidget {
 class _FileSystemWidgetState extends State<FileSystemWidget> {
   // Current path in the file system as list of nodes
   List<FileSystemNode> _currentPath = [];
-
+  String currentBaseName = '';
   String currentPathString = '';
 
 
@@ -38,7 +38,7 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentPathString.isEmpty ? 'Current Folder' : currentPathString),
+        title: Text(currentPathString.isEmpty ? 'Select a Folder' : currentPathString),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -53,7 +53,12 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
 
   List<Widget> _buildFileSystemColumns() {
     List<Widget> columns = [];
-    List<FileSystemNode> currentLevel = widget.nodes;
+    List<FileSystemNode> currentLevel =  [] ;
+    if (widget.base != null){
+      currentBaseName = widget.base!.name.split('/').last;
+      currentLevel = widget.base!.children;
+    }
+    
 
     currentLevel.sort((b, a) => a.size.compareTo(b.size));
 
@@ -196,7 +201,8 @@ class _FileSystemWidgetState extends State<FileSystemWidget> {
     }
   }
     void _updatePathString() {
-    List<String> pathNames = ['Root'];
+    List<String> pathNames = [currentBaseName];
+
     for (var node in _currentPath) {
       pathNames.add(node.name);
     }

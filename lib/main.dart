@@ -31,17 +31,17 @@ class _MyAppState extends State<MyApp> {
   GlobalKey key = GlobalKey();
   List<FileSystemNode> currentPath = [];
 
-  var statusText = "Scanning drive...";
+  var statusText = "Select scanning target";
 
 
   @override
   void initState() {
     super.initState();
-      scanner.fileCountStream.listen((count) {
+    scanner.fileCountStream.listen((count) {
     setState(() {
       
       statusText = formatBytes(count, 2);
-            statusText = "Total scanned: ${formatBytes(count, 2)}";
+      statusText = "Total scanned: ${formatBytes(count, 2)}";
 
     });
   });
@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
             
 
             Expanded(child: 
-              FileSystemWidget(nodes: filelist,changeCallback: changeFolderInList, currentPath: currentPath)),
+              FileSystemWidget(base: scanner.root,changeCallback: changeFolderInList, currentPath: currentPath)),
             Expanded(child: 
               Column(
                 children: [

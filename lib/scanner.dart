@@ -60,7 +60,7 @@ class FileSystemNode {
 class FolderSizeCalculator {
   String folderPath;
   final StreamController<int> _fileCountController = StreamController<int>();
-
+  FileSystemNode? root;
   FolderSizeCalculator(this.folderPath);
 
   // Stream of the current total files scanned
@@ -76,6 +76,7 @@ class FolderSizeCalculator {
     var topNode = await _mapDirectory(directory);
     
     topNode.name = folderPath;
+    root = topNode;
     // _fileCountController.close(); // Close the stream controller when done
     return topNode;
   }
