@@ -16,10 +16,10 @@ The main target platforms are windows and macos.
 - Reveal in file system on macos
 - Reveal in file system on windows
 - Active Progress of scanning
+- Selecting root folder for scanning
 
 
 ## Future features
 
 - Collector preview
-- Selecting root folder for scanning
 - Deleting items via collector
